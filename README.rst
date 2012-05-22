@@ -1,23 +1,22 @@
 euler_pole
 ============
-`euler_pole` provides an `EulerPole` class for plate motion calculations using
-Euler poles.  This allows the calculation of velocity at specified points on
-the Earth's surface as well as calculating the relative motion between two
-defined Euler poles.
+``euler_pole`` provides an ``EulerPole`` class for plate motion calculations
+using Euler poles in python.  This allows the calculation of velocity at
+specified points on the Earth's surface as well as calculating the relative
+motion between two defined Euler poles.
 
 Basic Usage
 -----------
-The `EulerPole` class allows addition and subtraction of euler poles and the calculation of velocity
+The ``EulerPole`` class allows addition and subtraction of euler poles and the
+calculation of velocity at a given point on the Earth's surface.
 
 
-As an example::
+As an example, here we have two euler poles from Loveless & Meade, 2010 given
+relative to the stable Eurasian reference frame of Apel, 2006.  We want to
+calculate the relative motion between them to determine the motion of the
+Philippine Sea Plate relative to the Amur Plate::
 
         from euler_pole import EulerPole
-
-        # Here we have two euler poles from Loveless & Meade, 2010 given
-        # relative to the stable Eurasian reference frame of Apel, 2006.
-        # We want to calculate the relative motion between them to determine
-        # the motion of the Philippine Sea Plate relative to the Amur Plate.
 
         # Movement of the Amur plate relative to the Eurasian reference frame
         #                degrees    degrees     deg / myr
@@ -29,7 +28,7 @@ As an example::
         # Movement of the Philippine Sea Plate relative to the Amur Plate
         phil_amur = philippine - amur
 
-        # Velocity at a given point:
+        # Velocity at a given point as an azimuth (in degrees) and rate (in mm/yr)
         print phil_amur.velocity(33.273, 136.781)
 
 

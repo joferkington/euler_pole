@@ -92,9 +92,41 @@ class EulerPole(object):
         vec = sph2cart(self.lat, self.lon, np.radians(self.rot_velocity))
         return np.array(vec)
 
-    def velocity(self, lat, lon, return_components=False):
-        """Returns the azimuth (in degrees) and rate of plate motion 
-        (in millimeters per million years) at a given point"""
+    def velocity(self, lat, lon):
+        """
+        Calculates the azimuth (in degrees) and rate of plate motion 
+        (in millimeters per year) at a given point.
+
+        Parameters:
+        -----------
+            lat : The latitude of the point in degrees
+            lon : The longitude of the point in degrees
+
+        Returns:
+            azimuth : The azimuth in degrees clockwise from north
+            rate : The rate in mm/yr
+
+        """
+        east, north, down = self.velocity_components(lat, lon)
+        azi = azimuth(east, north)
+        rate = np.sqrt(north**2 + east**2 + down**2)
+        return azi, rate
+
+    def velocity_components(self, lat, lon):
+        """
+        Calculates the eastward, northward, and downward componenents (in mm/yr) 
+        of plate velocity at a given point.
+
+        Parameters:
+        -----------
+            lat : The latitude of the point in degrees
+            lon : The longitude of the point in degrees
+
+        Returns:
+        --------
+            east, north : The eastward and northward components of the plate
+                velocity in millimeters per year at the given point.
+        """
         # Convert position (from lat, lon) into geocentric cartesian coords
         r = sph2cart(lat, lon, self.earth_radius)
 
@@ -102,13 +134,9 @@ class EulerPole(object):
         v = np.cross(self.omega, r)
 
         # We can then convert this back to local (north, east, down) coordinates
-        north, east, down = local_coords(lat, lon, v[0], v[1], v[2])
-        azi = azimuth(north, east)
-        rate = np.sqrt(north**2 + east**2 + down**2)
-        if return_components:
-            return azi, rate, north, east, down
-        else:
-            return azi, rate
+        east, north, down = local_coords(lat, lon, v[0], v[1], v[2])
+        return east, north, down
+
 
 #-- Utility Functions --------------------------------------------------------
 def sph2cart(lat, lon, r=1):
@@ -130,7 +158,7 @@ def cart2sph(x,y,z):
     return np.degrees(lat), np.degrees(lon), r
 
 def local_coords(lat, lon, x,y,z):
-    """Calculate local north,east,down components of x,y,z at lat,lon"""
+    """Calculate local east,north,down components of x,y,z at lat,lon"""
     lat, lon = np.radians(lat), np.radians(lon)
 
     north = - np.sin(lat) * np.cos(lon) * x \
@@ -142,9 +170,9 @@ def local_coords(lat, lon, x,y,z):
     down = - np.cos(lat) * np.cos(lon) * x \
            - np.cos(lat) * np.sin(lon) \
            - np.sin(lat) * z
-    return north, east, down
+    return east, north, down
 
-def azimuth(north, east):
+def azimuth(east, north):
     """Returns azimuth in degrees counterclockwise from North given north and
     east components"""
     azi = np.degrees(np.arctan2(north, east))
